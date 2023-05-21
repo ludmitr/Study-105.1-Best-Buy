@@ -3,11 +3,15 @@ import store
 import sys
 
 
-def start(my_store: store.Store):
+def start():
+    """ This function starts the main program loop. The user is presented
+    with a menu of options to interact with the store. This loop continues
+    until the user decides to quit."""
     while True:
         print_menu()
         user_input = input("Please choose a number: ")
         execute_user_input(user_input)
+
 
 def execute_user_input(user_input: str) -> None:
     """
@@ -25,6 +29,7 @@ def execute_user_input(user_input: str) -> None:
     if user_input in menu_functions_dict:
         menu_functions_dict[user_input]()
 
+
 def print_all_products_in_store():
     all_products = best_buy.get_all_products()
 
@@ -34,11 +39,13 @@ def print_all_products_in_store():
         print(store_product.show())
     print("-"*10)
 
+
 def print_total_amount_in_store():
     print("-"*10)
     total_amount = best_buy.get_total_quantity()
     print(f"Total of {total_amount} items in store")
     print("-"*10)
+
 
 def make_an_order():
     all_products = best_buy.get_all_products()
@@ -117,4 +124,4 @@ if __name__ == '__main__':
         products.Product("Google Pixel 7", price=500, quantity=250)
     ]
     best_buy = store.Store(product_list)
-    start(best_buy)
+    start()
