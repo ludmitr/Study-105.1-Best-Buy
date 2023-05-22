@@ -15,7 +15,8 @@ def start():
 
 def execute_user_input(user_input: str) -> None:
     """
-   This function executes the corresponding functionality based on the user's input.
+   This function executes the corresponding functionality based on the
+   user's input.
 
    :param user_input: The user's input choice.
    :return: None
