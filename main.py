@@ -48,6 +48,8 @@ def print_total_amount_in_store():
 
 
 def make_an_order():
+    """Allows the user to make an order by
+    selecting products and quantities."""
     all_products = best_buy.get_all_products()
     print_products_list(all_products)
 
@@ -67,7 +69,14 @@ def make_an_order():
 
 
 def get_quantities_of_products_from_user(all_products: list) -> dict:
-    """Returns dict where key is Product and val is quantity"""
+    """
+    Returns a dictionary where the key is a Product and the value
+    is the quantity chosen by the user. Quit the loop if both inputs are
+    empty.
+
+    :param all_products: List of all products available in the store.
+    :return: Dictionary with Product as key and chosen quantity as value.
+    """
     orders = {prod: 0 for prod in all_products}
     while True:
         user_number_input = input("Which product # do you want? ")
