@@ -64,8 +64,8 @@ def make_an_order():
         list_order.append((product, quantity))
 
     price_paid = best_buy.order(list_order)
-    if price_paid != 0:
-        print("*"*8)
+    if price_paid:
+        print("*" * 8)
         print(f"Order made! Total payment: {price_paid}")
 
 
@@ -88,7 +88,7 @@ def get_quantities_of_products_from_user(all_products: list) -> dict:
         try:
             product_index = int(user_number_input)-1
             if product_index not in range(len(all_products)):
-                raise ValueError
+                raise ValueError("Wrong index")
             product_to_buy = all_products[product_index]
             quantity = int(user_amount_input)
             if quantity < 0:

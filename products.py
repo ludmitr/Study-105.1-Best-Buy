@@ -32,7 +32,7 @@ class Product:
         if quantity < 0:
             raise ValueError("quantity cannot be negative")
         self._quantity = quantity
-        if self._quantity == 0:
+        if not self._quantity:
             self._active = False
 
     def is_active(self) -> bool:

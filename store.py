@@ -2,15 +2,7 @@ from products import Product
 
 
 class Store:
-    """This class represents a store with a list of products.
-    Methods:
-    -add_product(Product): Add a new product to the store.
-    -remove_product(Product): Remove a product from the store.
-    -get_total_quantity(): Get the total quantity of all products in the store.
-    -get_all_products(): Get a list of all active products in the store.
-    -order(list[tuple[Product, int]]): Buy a specified quantity of each product
-     and return the total price of the order.
-    """
+    """This class represents a store with a list of products."""
     def __init__(self, store_products: list[Product]):
         self._products = store_products
 
