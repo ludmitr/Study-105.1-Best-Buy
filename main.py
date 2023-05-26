@@ -7,19 +7,26 @@ def start():
     """ This function starts the main program loop. The user is presented
     with a menu of options to interact with the store. This loop continues
     until the user decides to quit."""
+    product_list = [
+        products.Product("MacBook Air M2", price=1450, quantity=100),
+        products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+        products.Product("Google Pixel 7", price=500, quantity=250)
+    ]
+    best_buy = store.Store(product_list)
     while True:
         print_menu()
         user_input = input("Please choose a number: ")
-        execute_user_input(user_input)
+        execute_user_input(user_input, best_buy)
 
 
-def execute_user_input(user_input: str) -> None:
+def execute_user_input(user_input: str, store_best_buy: store.Store) -> None:
     """
-   This function executes the corresponding functionality based on the
-   user's input.
+    This function executes the corresponding functionality based on the
+    user's input.
 
-   :param user_input: The user's input choice.
-   :return: None
+    :param store_best_buy: represent class store with products
+    :param user_input: The user's input choice.
+    :return: None
     """
     menu_functions_dict = {
         "1": print_all_products_in_store,
@@ -28,11 +35,11 @@ def execute_user_input(user_input: str) -> None:
         "4": quit_the_programm,
     }
     if user_input in menu_functions_dict:
-        menu_functions_dict[user_input]()
+        menu_functions_dict[user_input](store_best_buy)
 
 
-def print_all_products_in_store():
-    all_products = best_buy.get_all_products()
+def print_all_products_in_store(store_best_buy: store.Store):
+    all_products = store_best_buy.get_all_products()
 
     # printing
     print("-"*10)
@@ -41,17 +48,17 @@ def print_all_products_in_store():
     print("-"*10)
 
 
-def print_total_amount_in_store():
+def print_total_amount_in_store(store_best_buy: store.Store):
     print("-"*10)
-    total_amount = best_buy.get_total_quantity()
+    total_amount = store_best_buy.get_total_quantity()
     print(f"Total of {total_amount} items in store")
     print("-"*10)
 
 
-def make_an_order():
+def make_an_order(store_best_buy: store.Store):
     """Allows the user to make an order by
     selecting products and quantities."""
-    all_products = best_buy.get_all_products()
+    all_products = store_best_buy.get_all_products()
     print_products_list(all_products)
 
     orders: dict = get_quantities_of_products_from_user(all_products)
@@ -63,7 +70,7 @@ def make_an_order():
             return
         list_order.append((product, quantity))
 
-    price_paid = best_buy.order(list_order)
+    price_paid = store_best_buy.order(list_order)
     if price_paid:
         print("*" * 8)
         print(f"Order made! Total payment: {price_paid}")
@@ -111,7 +118,7 @@ def print_products_list(all_products):
     print("When you want to finish order, enter empty text.")
 
 
-def quit_the_programm():
+def quit_the_programm(*args):
     print("BYE")
     sys.exit()
 
@@ -128,10 +135,5 @@ def print_menu():
 
 
 if __name__ == '__main__':
-    product_list = [
-        products.Product("MacBook Air M2", price=1450, quantity=100),
-        products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-        products.Product("Google Pixel 7", price=500, quantity=250)
-    ]
-    best_buy = store.Store(product_list)
+
     start()
