@@ -58,10 +58,11 @@ def print_total_amount_in_store(store_best_buy: store.Store):
 def make_an_order(store_best_buy: store.Store):
     """Allows the user to make an order by
     selecting products and quantities."""
-    all_products = store_best_buy.get_all_products()
+    all_products: list[products.Product] = store_best_buy.get_all_products()
     print_products_list(all_products)
 
-    orders: dict = get_quantities_of_products_from_user(all_products)
+    orders: dict[products.Product, int] =\
+        get_quantities_of_products_from_user(all_products)
 
     list_order = []
     for product, quantity in orders.items():
@@ -70,6 +71,7 @@ def make_an_order(store_best_buy: store.Store):
             return
         list_order.append((product, quantity))
 
+    # making an order
     price_paid = store_best_buy.order(list_order)
     if price_paid:
         print("*" * 8)
@@ -85,29 +87,49 @@ def get_quantities_of_products_from_user(all_products: list) -> dict:
     :param all_products: List of all products available in the store.
     :return: Dictionary with Product as key and chosen quantity as value.
     """
-    orders = {prod: 0 for prod in all_products}
+    orders = {}
     while True:
         user_number_input = input("Which product # do you want? ")
         user_amount_input = input("What amount do you want? ")
+
+        # case quitting loop
         if not user_number_input and not user_amount_input:
             break
+
+        # validate user input,
         message = "Product added to the list"
         try:
-            product_index = int(user_number_input)-1
-            if product_index not in range(len(all_products)):
-                raise ValueError("Wrong index")
-            product_to_buy = all_products[product_index]
-            quantity = int(user_amount_input)
-            if quantity < 0:
-                raise ValueError
+            product_to_buy, quantity = validate_user_input(user_number_input,
+                                                           user_amount_input,
+                                                           all_products, orders)
+            # adding product and quantity to orders dict
             if product_to_buy in orders:
                 orders[product_to_buy] += quantity
+            else:
+                orders[product_to_buy] = quantity
+
         except(IndexError, ValueError):
             message = "Error adding product!"
         print(message)
 
     return orders
 
+
+def validate_user_input(user_number_input: str, user_amount_input: str,
+                        all_products: list, orders: dict):
+    """validating user input. if the input is invalid -
+    it will raise an error, otherwise it will return
+    a tuple of product name:str and quantity: int"""
+    product_index = int(user_number_input) - 1
+
+    if product_index not in range(len(all_products)):
+        raise ValueError("Wrong index")
+    product_to_buy = all_products[product_index]
+    quantity = int(user_amount_input)
+    if quantity <= 0:
+        raise ValueError
+
+    return product_to_buy, quantity
 
 def print_products_list(all_products):
     """Printing list of items for make_an_order func"""
