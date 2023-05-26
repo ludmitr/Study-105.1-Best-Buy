@@ -12,7 +12,7 @@ class Product:
      price of the purchase."""
     def __init__(self, name: str, price: float, quantity: int):
         if not name:
-            raise ValueError("name cannot be empty.")
+            raise ValueError("name cannot be empty")
         if price < 0:
             raise ValueError("price cannot be negative")
         if quantity <= 0:
