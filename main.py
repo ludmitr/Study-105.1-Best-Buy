@@ -65,15 +65,13 @@ def make_an_order(store_best_buy: store.Store):
         get_quantities_of_products_from_user(all_products)
 
     # creating list_order by running on orders
-    list_order = []
-    for product, quantity in orders.items():
-        if product.get_quantity() < quantity:
-            print("Error while making order! Quantity larger than what exists")
-            return
-        list_order.append((product, quantity))
+    list_order = [(product, quantity) for product, quantity in orders.items()]
 
-    # making an order
-    price_paid = store_best_buy.order(list_order)
+    try:
+        price_paid = store_best_buy.order(list_order)
+    except ValueError as e:
+        print(e)
+        return
 
     if price_paid:
         print("*" * 8)

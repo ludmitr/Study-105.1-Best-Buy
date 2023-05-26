@@ -1,29 +1,18 @@
 class Product:
-    """The Product class represents a product in the store.
-    Methods:
-    - get_quantity(): Returns the quantity of the product.
-    - set_quantity(quantity): Sets the quantity of the product. If the quantity
-     reaches 0, the product is deactivated.
-    - is_active(): Returns True if the product is active, otherwise False.
-    - activate(): Activates the product.
-    - deactivate(): Deactivates the product.
-    - show(): Returns a string representation of the product.
-    - buy(quantity): Buys a given quantity of the product and returns the total
-     price of the purchase."""
+    """The Product class represents a product in the store."""
     def __init__(self, name: str, price: float, quantity: int):
         if not name:
             raise ValueError("name cannot be empty")
         if price < 0:
             raise ValueError("price cannot be negative")
-        if quantity <= 0:
-            raise ValueError("quantity cannot be negative or zero")
+
         self._name = name
         self._price = price
-        self._quantity = quantity
+        self.__set_quantity(quantity)
         self._active = True
 
-    def get_quantity(self) -> float:
-        """Returns the quantity (float)"""
+    def get_quantity(self) -> int:
+        """Returns the quantity (int)"""
         return self._quantity
 
     def set_quantity(self, quantity: int):
@@ -34,6 +23,8 @@ class Product:
         self._quantity = quantity
         if not self._quantity:
             self._active = False
+
+    __set_quantity = set_quantity
 
     def is_active(self) -> bool:
         """Returns True if the product is active, otherwise False."""
@@ -55,6 +46,52 @@ class Product:
     def buy(self, quantity: int) -> float:
         """Buys a given quantity of the product.
         Returns the total price (float) of the purchase"""
+        if quantity > self._quantity:
+            raise ValueError("Error while making order! "
+                             "Quantity larger than what exists")
+
+        # deactivate product if it reached 0
+        self._quantity -= quantity
+        if self._quantity == 0:
+            self.deactivate()
+
+        total_price = self._price * quantity
+        return total_price
+
+
+class NonStockedProduct(Product):
+    """Not physical product. quantity always stays 0 """
+    _QUANTITY = 0
+
+    def __init__(self, name: str, price: float):
+        super().__init__(name, price, NonStockedProduct._QUANTITY)
+
+    def set_quantity(self, quantity):
+        """quantity always stays 0, you cannot change quantity of not
+        physical product"""
+        pass
+
+    def get_quantity(self) -> int:
+        return NonStockedProduct._QUANTITY
+
+    def show(self):
+        """Returns a string that represents the product"""
+        return f"{self._name}, Price: {self._price}"
+        return f"{self._name}, Price: {self._price}," \
+               f" Quantity: Unlimited"
+
+
+class LimitedProduct(Product):
+    """this product can be purchased maximum amount of times in an order"""
+    def __init__(self, name:str, price: float, quantity: int, maximum: int):
+        super().__init__(name, price, quantity, maximum)
+        self._maximum = maximum
+
+    def buy(self, quantity: int) -> float:
+        """Buys a given quantity of the product.
+        Returns the total price (float) of the purchase"""
+        if quantity > self._maximum:
+            raise ValueError(f"Product can be purchased {self._maximum} times")
         if quantity > self._quantity:
             raise ValueError("quantity has to be equal or less "
                              "to the quantity of the product")

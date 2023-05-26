@@ -39,9 +39,7 @@ class Store:
 
         # buying product if it in the store, and it has required quantity
         for order_product, quantity_to_buy in shopping_list:
-            if order_product in store_products:
-                if order_product.get_quantity() >= quantity_to_buy:
-                    total_price += order_product.buy(quantity_to_buy)
+            total_price += order_product.buy(quantity_to_buy)
 
         return total_price
 

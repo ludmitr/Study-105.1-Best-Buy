@@ -17,12 +17,8 @@ def test_creating_prod_invalid_details():
         products.Product("tv", -22.5, 100)
 
     with pytest.raises(ValueError,
-                       match="quantity cannot be negative or zero"):
+                       match="quantity cannot be negative"):
         products.Product("tv", 22.5, -100)
-
-    with pytest.raises(ValueError,
-                       match="quantity cannot be negative or zero"):
-        products.Product("tv", 22.5, 0)
 
 
 def test_prod_becomes_inactive():
