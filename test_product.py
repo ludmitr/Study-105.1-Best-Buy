@@ -44,8 +44,8 @@ def test_purchase_modify_quantity():
 
 def test_buy_larger_quantity():
     """Test that buying a larger quantity than exists invokes exception"""
-    with pytest.raises(ValueError, match="quantity has to be equal or less "
-                                         "to the quantity of the product"):
+    with pytest.raises(ValueError, match="Error while making order! "
+                                         "Quantity larger than what exists"):
         test_product = products.Product("tv", 22.5, 110)
         test_product.buy(120)
 

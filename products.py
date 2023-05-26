@@ -74,27 +74,33 @@ class NonStockedProduct(Product):
     def get_quantity(self) -> int:
         return NonStockedProduct._QUANTITY
 
+    def buy(self, quantity: int) -> float:
+        """Buys a given quantity of the product.
+        Returns the total price (float) of the purchase"""
+        total_price = self._price * quantity
+        return total_price
+
     def show(self):
         """Returns a string that represents the product"""
-        return f"{self._name}, Price: {self._price}"
         return f"{self._name}, Price: {self._price}," \
                f" Quantity: Unlimited"
 
 
 class LimitedProduct(Product):
     """this product can be purchased maximum amount of times in an order"""
-    def __init__(self, name:str, price: float, quantity: int, maximum: int):
-        super().__init__(name, price, quantity, maximum)
+    def __init__(self, name: str, price: float, quantity: int, maximum: int):
+        super().__init__(name, price, quantity)
         self._maximum = maximum
 
     def buy(self, quantity: int) -> float:
         """Buys a given quantity of the product.
         Returns the total price (float) of the purchase"""
         if quantity > self._maximum:
-            raise ValueError(f"Product can be purchased {self._maximum} times")
+            raise ValueError(f"Product {self._name} can be purchased"
+                             f" {self._maximum} times")
         if quantity > self._quantity:
-            raise ValueError("quantity has to be equal or less "
-                             "to the quantity of the product")
+            raise ValueError("Error while making order! "
+                             "Quantity larger than what exists")
 
         # deactivate product if it reached 0
         self._quantity -= quantity
