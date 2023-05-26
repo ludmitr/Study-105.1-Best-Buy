@@ -28,7 +28,7 @@ def test_creating_prod_invalid_details():
 def test_prod_becomes_inactive():
     """checking if is_active will return False when product hit
     0 quantity"""
-    #checking case when i set quantity to 0
+    # checking case when i set quantity to 0
     test_product = products.Product("tv", 22.5, 1)
     test_product.set_quantity(0)
     assert not test_product.is_active()
@@ -39,8 +39,8 @@ def test_prod_becomes_inactive():
     assert not test_product.is_active()
 
 
-
 def test_purchase_modify_quantity():
+    """test that buying product modify quantity of a product"""
     test_product = products.Product("tv", 22.5, 110)
     test_product.buy(100)
     assert test_product.get_quantity() == 10

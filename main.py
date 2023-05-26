@@ -64,6 +64,7 @@ def make_an_order(store_best_buy: store.Store):
     orders: dict[products.Product, int] =\
         get_quantities_of_products_from_user(all_products)
 
+    # creating list_order by running on orders
     list_order = []
     for product, quantity in orders.items():
         if product.get_quantity() < quantity:
@@ -73,6 +74,7 @@ def make_an_order(store_best_buy: store.Store):
 
     # making an order
     price_paid = store_best_buy.order(list_order)
+
     if price_paid:
         print("*" * 8)
         print(f"Order made! Total payment: {price_paid}")
