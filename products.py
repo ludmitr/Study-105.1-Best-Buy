@@ -23,6 +23,12 @@ class Product:
         """Set the promotions for the product"""
         self._promotion = product_promotion
 
+    def del_promotion(self):
+        """deleting promotion"""
+        self._promotion = None
+
+    promotion = property(get_promotion, set_promotion, del_promotion)
+
     def get_quantity(self) -> int:
         """Returns the quantity (int)"""
         return self._quantity

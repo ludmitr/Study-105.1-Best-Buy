@@ -1,5 +1,6 @@
 import products
 import pytest
+import promotions
 
 
 def test_creating_instance():
@@ -49,5 +50,13 @@ def test_buy_larger_quantity():
         test_product = products.Product("tv", 22.5, 110)
         test_product.buy(120)
 
+def test_property_promotion():
+    """testing get/set/del property"""
+    test_prod = products.Product("tv", 22.5, 110)
+    test_prom = promotions.ThirdOneFree("Third One Free!")
+    test_prod.promotion = test_prom
+    assert test_prod.promotion.get_name() == "Third One Free!"
+    del test_prod.promotion
+    assert not test_prod.promotion
 
 pytest.main()
