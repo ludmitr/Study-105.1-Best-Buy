@@ -1,29 +1,54 @@
+import promotions
+
+
 class Product:
-    """The Product class represents a product in the store.
-    Methods:
-    - get_quantity(): Returns the quantity of the product.
-    - set_quantity(quantity): Sets the quantity of the product. If the quantity
-     reaches 0, the product is deactivated.
-    - is_active(): Returns True if the product is active, otherwise False.
-    - activate(): Activates the product.
-    - deactivate(): Deactivates the product.
-    - show(): Returns a string representation of the product.
-    - buy(quantity): Buys a given quantity of the product and returns the total
-     price of the purchase."""
+    """The Product class represents a product in the store."""
     def __init__(self, name: str, price: float, quantity: int):
         if not name:
-            raise ValueError("name cannot be empty.")
+            raise ValueError("name cannot be empty")
         if price < 0:
             raise ValueError("price cannot be negative")
-        if quantity <= 0:
-            raise ValueError("quantity cannot be negative or zero")
+
         self._name = name
         self._price = price
-        self._quantity = quantity
+        self.__set_quantity(quantity)
         self._active = True
+        self._promotion: promotions.Promotion = None
 
-    def get_quantity(self) -> float:
-        """Returns the quantity (float)"""
+
+    def __gt__(self, other):
+        return self.price > other.price
+
+    def __lt__(self, other):
+        return self.price < other.price
+    def get_price(self) -> float:
+        return self._price
+
+    def set_price(self, price: float):
+        if price < 0:
+                raise ValueError("price cannot be negative")
+        self._price = price
+
+    price = property(get_price, set_price)
+    def __str__(self):
+        return self.show()
+
+    def get_promotion(self):
+        """returns list[Promotion] of promotions of the class"""
+        return self._promotion
+
+    def set_promotion(self, product_promotion: promotions.Promotion):
+        """Set the promotions for the product"""
+        self._promotion = product_promotion
+
+    def del_promotion(self):
+        """deleting promotion"""
+        self._promotion = None
+
+    promotion = property(get_promotion, set_promotion, del_promotion)
+
+    def get_quantity(self) -> int:
+        """Returns the quantity (int)"""
         return self._quantity
 
     def set_quantity(self, quantity: int):
@@ -34,6 +59,9 @@ class Product:
         self._quantity = quantity
         if not self._quantity:
             self._active = False
+
+    __set_quantity = set_quantity
+    quantity = property(get_quantity, set_quantity)
 
     def is_active(self) -> bool:
         """Returns True if the product is active, otherwise False."""
@@ -49,20 +77,106 @@ class Product:
 
     def show(self) -> str:
         """Returns a string that represents the product"""
-        return f"{self._name}, Price: {self._price}," \
-               f" Quantity: {self._quantity}"
+        product_representation = f"{self._name}, Price: {self._price}," \
+                                 f" Quantity: {self._quantity}"
+
+        # adding promotions if there is any
+        if self._promotion:
+            product_representation += f", Promotion: {self._promotion.get_name()}"
+
+        return product_representation
 
     def buy(self, quantity: int) -> float:
         """Buys a given quantity of the product.
         Returns the total price (float) of the purchase"""
         if quantity > self._quantity:
-            raise ValueError("quantity has to be equal or less "
-                             "to the quantity of the product")
+            raise ValueError("Error while making order! "
+                             "Quantity larger than what exists")
+
+        # assign total_price
+        if self._promotion:
+                total_price = self._promotion.apply_promotion(quantity,
+                                                              self._price)
+        else:
+            total_price = self._price * quantity
 
         # deactivate product if it reached 0
         self._quantity -= quantity
         if self._quantity == 0:
             self.deactivate()
 
-        total_price = self._price * quantity
+        return total_price
+
+
+class NonStockedProduct(Product):
+    """Not physical product. quantity always stays 0 """
+    _QUANTITY = 0
+
+    def __init__(self, name: str, price: float):
+        super().__init__(name, price, NonStockedProduct._QUANTITY)
+
+    def set_quantity(self, quantity):
+        """quantity always stays 0, you cannot change quantity of not
+        physical product"""
+        pass
+
+    def get_quantity(self) -> int:
+        """returns quantity of product"""
+        return NonStockedProduct._QUANTITY
+
+    quantity = property(get_quantity, set_quantity)
+
+    def buy(self, quantity: int) -> float:
+        """Buys a given quantity of the product.
+        Returns the total price (float) of the purchase"""
+        # calculate total price
+        prom = self.get_promotion()
+        if prom:  # case when there is promotion
+            total_price = prom.apply_promotion(quantity, self._price)
+        else:
+            total_price = self._price * quantity
+
+        return total_price
+
+    def show(self):
+        """Returns a string that represents the product"""
+        product_representation = f"{self._name}, Price: {self._price}," \
+                                 f" Quantity: Unlimited"
+
+        # adding promotions if there is any
+        prom = self.get_promotion()
+        if prom:
+            product_representation += f", Promotion: {prom.get_name()}"
+
+        return product_representation
+
+
+class LimitedProduct(Product):
+    """this product can be purchased maximum amount of times in an order"""
+    def __init__(self, name: str, price: float, quantity: int, maximum: int):
+        super().__init__(name, price, quantity)
+        self._maximum = maximum
+
+    def buy(self, quantity: int) -> float:
+        """Buys a given quantity of the product.
+        Returns the total price (float) of the purchase"""
+        if quantity > self._maximum:
+            raise ValueError(f"Product {self._name} can be purchased"
+                             f" {self._maximum} times")
+        if quantity > self._quantity:
+            raise ValueError("Error while making order! "
+                             "Quantity larger than what exists")
+
+        # calculate total price
+        prom = self.get_promotion()
+        if prom:  # case when there is promotions
+            total_price = prom.apply_promotion(quantity, self._price)
+        else:
+            total_price = self._price * quantity
+
+        # deactivate product if it reached 0
+        self._quantity -= quantity
+        if self._quantity == 0:
+            self.deactivate()
+
         return total_price

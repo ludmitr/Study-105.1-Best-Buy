@@ -1,25 +1,45 @@
 import products
 import store
 import sys
+import promotions
 
 
 def start():
     """ This function starts the main program loop. The user is presented
     with a menu of options to interact with the store. This loop continues
     until the user decides to quit."""
+    product_list = [
+        products.Product("MacBook Air M2", price=1450, quantity=100),
+        products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+        products.Product("Google Pixel 7", price=500, quantity=250),
+        products.NonStockedProduct("Windows License", price=125),
+        products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
+        ]
+
+    # Create promotion catalog
+    second_half_price = promotions.SecondHalfPrice("Second Half price!")
+    third_one_free = promotions.ThirdOneFree("Third One Free!")
+    thirty_percent = promotions.PercentDiscount("30% off!", percent=30)
+
+    # Add promotions to products
+    product_list[0].set_promotion(second_half_price)
+    product_list[1].set_promotion(third_one_free)
+    product_list[3].set_promotion(thirty_percent)
+    best_buy = store.Store(product_list)
     while True:
         print_menu()
         user_input = input("Please choose a number: ")
-        execute_user_input(user_input)
+        execute_user_input(user_input, best_buy)
 
 
-def execute_user_input(user_input: str) -> None:
+def execute_user_input(user_input: str, store_best_buy: store.Store) -> None:
     """
-   This function executes the corresponding functionality based on the
-   user's input.
+    This function executes the corresponding functionality based on the
+    user's input.
 
-   :param user_input: The user's input choice.
-   :return: None
+    :param store_best_buy: represent class store with products
+    :param user_input: The user's input choice.
+    :return: None
     """
     menu_functions_dict = {
         "1": print_all_products_in_store,
@@ -28,11 +48,11 @@ def execute_user_input(user_input: str) -> None:
         "4": quit_the_programm,
     }
     if user_input in menu_functions_dict:
-        menu_functions_dict[user_input]()
+        menu_functions_dict[user_input](store_best_buy)
 
 
-def print_all_products_in_store():
-    all_products = best_buy.get_all_products()
+def print_all_products_in_store(store_best_buy: store.Store):
+    all_products = store_best_buy.get_all_products()
 
     # printing
     print("-"*10)
@@ -41,29 +61,32 @@ def print_all_products_in_store():
     print("-"*10)
 
 
-def print_total_amount_in_store():
+def print_total_amount_in_store(store_best_buy: store.Store):
     print("-"*10)
-    total_amount = best_buy.get_total_quantity()
+    total_amount = store_best_buy.get_total_quantity()
     print(f"Total of {total_amount} items in store")
     print("-"*10)
 
 
-def make_an_order():
+def make_an_order(store_best_buy: store.Store):
     """Allows the user to make an order by
     selecting products and quantities."""
-    all_products = best_buy.get_all_products()
+    all_products: list[products.Product] = store_best_buy.get_all_products()
     print_products_list(all_products)
 
-    orders: dict = get_quantities_of_products_from_user(all_products)
+    # dictionary key:Product, value:int - amount to buy. represent user order
+    orders: dict[products.Product, int] =\
+        get_quantities_of_products_from_user(all_products)
 
-    list_order = []
-    for product, quantity in orders.items():
-        if product.get_quantity() < quantity:
-            print("Error while making order! Quantity larger than what exists")
-            return
-        list_order.append((product, quantity))
+    # creating list_order by running on orders
+    list_order = [(product, quantity) for product, quantity in orders.items()]
 
-    price_paid = best_buy.order(list_order)
+    try:
+        price_paid = store_best_buy.order(list_order)
+    except ValueError as e:
+        print(e)
+        return
+
     if price_paid:
         print("*" * 8)
         print(f"Order made! Total payment: {price_paid}")
@@ -78,29 +101,49 @@ def get_quantities_of_products_from_user(all_products: list) -> dict:
     :param all_products: List of all products available in the store.
     :return: Dictionary with Product as key and chosen quantity as value.
     """
-    orders = {prod: 0 for prod in all_products}
+    orders = {}
     while True:
         user_number_input = input("Which product # do you want? ")
         user_amount_input = input("What amount do you want? ")
+
+        # case quitting loop
         if not user_number_input and not user_amount_input:
             break
+
+        # validate user input,
         message = "Product added to the list"
         try:
-            product_index = int(user_number_input)-1
-            if product_index not in range(len(all_products)):
-                raise ValueError("Wrong index")
-            product_to_buy = all_products[product_index]
-            quantity = int(user_amount_input)
-            if quantity < 0:
-                raise ValueError
+            product_to_buy, quantity = validate_user_input(user_number_input,
+                                                           user_amount_input,
+                                                           all_products, orders)
+            # adding product and quantity to orders dict
             if product_to_buy in orders:
                 orders[product_to_buy] += quantity
+            else:
+                orders[product_to_buy] = quantity
+
         except(IndexError, ValueError):
             message = "Error adding product!"
         print(message)
 
     return orders
 
+
+def validate_user_input(user_number_input: str, user_amount_input: str,
+                        all_products: list, orders: dict):
+    """validating user input. if the input is invalid -
+    it will raise an error, otherwise it will return
+    a tuple of product name:str and quantity: int"""
+    product_index = int(user_number_input) - 1
+
+    if product_index not in range(len(all_products)):
+        raise ValueError("Wrong index")
+    product_to_buy = all_products[product_index]
+    quantity = int(user_amount_input)
+    if quantity <= 0:
+        raise ValueError
+
+    return product_to_buy, quantity
 
 def print_products_list(all_products):
     """Printing list of items for make_an_order func"""
@@ -111,7 +154,7 @@ def print_products_list(all_products):
     print("When you want to finish order, enter empty text.")
 
 
-def quit_the_programm():
+def quit_the_programm(*args):
     print("BYE")
     sys.exit()
 
@@ -128,10 +171,5 @@ def print_menu():
 
 
 if __name__ == '__main__':
-    product_list = [
-        products.Product("MacBook Air M2", price=1450, quantity=100),
-        products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-        products.Product("Google Pixel 7", price=500, quantity=250)
-    ]
-    best_buy = store.Store(product_list)
+
     start()

@@ -6,6 +6,9 @@ class Store:
     def __init__(self, store_products: list[Product]):
         self._products = store_products
 
+    def __contains__(self, item):
+        return item in self._products
+
     def add_product(self, product: Product):
         """Adding product to the list of products in the store"""
         self._products.append(product)
@@ -39,9 +42,7 @@ class Store:
 
         # buying product if it in the store, and it has required quantity
         for order_product, quantity_to_buy in shopping_list:
-            if order_product in store_products:
-                if order_product.get_quantity() >= quantity_to_buy:
-                    total_price += order_product.buy(quantity_to_buy)
+            total_price += order_product.buy(quantity_to_buy)
 
         return total_price
 
