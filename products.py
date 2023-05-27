@@ -1,6 +1,9 @@
+import promotions
+
 class Product:
     """The Product class represents a product in the store."""
-    def __init__(self, name: str, price: float, quantity: int):
+    def __init__(self, name: str, price: float,
+                 quantity: int, *args: promotions.Promotion):
         if not name:
             raise ValueError("name cannot be empty")
         if price < 0:
@@ -9,6 +12,7 @@ class Product:
         self._name = name
         self._price = price
         self.__set_quantity(quantity)
+        self._promotions = args
         self._active = True
 
     def get_quantity(self) -> int:
