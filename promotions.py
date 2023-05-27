@@ -15,6 +15,10 @@ class Promotion(abc.ABC):
     def __init__(self, name):
         self._name = name
 
+    def get_name(self) -> str:
+        """returns name of promotion"""
+        return self._name
+
     @abc.abstractmethod
     def apply_promotion(self, quantity: int, price: float) -> float:
         """

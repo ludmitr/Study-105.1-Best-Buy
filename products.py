@@ -1,9 +1,9 @@
 import promotions
 
+
 class Product:
     """The Product class represents a product in the store."""
-    def __init__(self, name: str, price: float,
-                 quantity: int, *args: promotions.Promotion):
+    def __init__(self, name: str, price: float, quantity: int):
         if not name:
             raise ValueError("name cannot be empty")
         if price < 0:
@@ -12,8 +12,16 @@ class Product:
         self._name = name
         self._price = price
         self.__set_quantity(quantity)
-        self._promotions = args
         self._active = True
+        self._promotion: promotions.Promotion = None
+
+    def get_promotion(self):
+        """returns list[Promotion] of promotions of the class"""
+        return self._promotion
+
+    def set_promotion(self, product_promotion: promotions.Promotion):
+        """Set the promotions for the product"""
+        self._promotion = product_promotion
 
     def get_quantity(self) -> int:
         """Returns the quantity (int)"""
@@ -44,8 +52,14 @@ class Product:
 
     def show(self) -> str:
         """Returns a string that represents the product"""
-        return f"{self._name}, Price: {self._price}," \
-               f" Quantity: {self._quantity}"
+        product_representation = f"{self._name}, Price: {self._price}," \
+                                 f" Quantity: {self._quantity}"
+
+        # adding promotions if there is any
+        if self._promotion:
+            product_representation += f", Promotion: {self._promotion.get_name()}"
+
+        return product_representation
 
     def buy(self, quantity: int) -> float:
         """Buys a given quantity of the product.
@@ -54,12 +68,18 @@ class Product:
             raise ValueError("Error while making order! "
                              "Quantity larger than what exists")
 
+        # assign total_price
+        if self._promotion:
+            total_price = self._promotion.apply_promotion(self._quantity,
+                                                          self._price)
+        else:
+            total_price = self._price * quantity
+
         # deactivate product if it reached 0
         self._quantity -= quantity
         if self._quantity == 0:
             self.deactivate()
 
-        total_price = self._price * quantity
         return total_price
 
 
@@ -76,18 +96,32 @@ class NonStockedProduct(Product):
         pass
 
     def get_quantity(self) -> int:
+        """returns quantity of product"""
         return NonStockedProduct._QUANTITY
 
     def buy(self, quantity: int) -> float:
         """Buys a given quantity of the product.
         Returns the total price (float) of the purchase"""
-        total_price = self._price * quantity
+        # calculate total price
+        prom = self.get_promotion()
+        if prom:  # case when there is promotion
+            total_price = prom.apply_promotion(self._quantity, self._price)
+        else:
+            total_price = self._price * quantity
+
         return total_price
 
     def show(self):
         """Returns a string that represents the product"""
-        return f"{self._name}, Price: {self._price}," \
-               f" Quantity: Unlimited"
+        product_representation = f"{self._name}, Price: {self._price}," \
+                                 f" Quantity: Unlimited"
+
+        # adding promotions if there is any
+        prom = self.get_promotion()
+        if prom:
+            product_representation += f", Promotion: {prom.get_name()}"
+
+        return product_representation
 
 
 class LimitedProduct(Product):
@@ -106,10 +140,16 @@ class LimitedProduct(Product):
             raise ValueError("Error while making order! "
                              "Quantity larger than what exists")
 
+        # calculate total price
+        prom = self.get_promotion()
+        if prom:  # case when there is promotions
+            total_price = prom.apply_promotion(self._quantity, self._price)
+        else:
+            total_price = self._price * quantity
+
         # deactivate product if it reached 0
         self._quantity -= quantity
         if self._quantity == 0:
             self.deactivate()
 
-        total_price = self._price * quantity
         return total_price
