@@ -74,6 +74,7 @@ def make_an_order(store_best_buy: store.Store):
     all_products: list[products.Product] = store_best_buy.get_all_products()
     print_products_list(all_products)
 
+    # dictionary key:Product, value:int - amount to buy. represent user order
     orders: dict[products.Product, int] =\
         get_quantities_of_products_from_user(all_products)
 

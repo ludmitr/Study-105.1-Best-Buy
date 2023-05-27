@@ -70,8 +70,8 @@ class Product:
 
         # assign total_price
         if self._promotion:
-            total_price = self._promotion.apply_promotion(self._quantity,
-                                                          self._price)
+                total_price = self._promotion.apply_promotion(quantity,
+                                                              self._price)
         else:
             total_price = self._price * quantity
 
@@ -105,7 +105,7 @@ class NonStockedProduct(Product):
         # calculate total price
         prom = self.get_promotion()
         if prom:  # case when there is promotion
-            total_price = prom.apply_promotion(self._quantity, self._price)
+            total_price = prom.apply_promotion(quantity, self._price)
         else:
             total_price = self._price * quantity
 
@@ -143,7 +143,7 @@ class LimitedProduct(Product):
         # calculate total price
         prom = self.get_promotion()
         if prom:  # case when there is promotions
-            total_price = prom.apply_promotion(self._quantity, self._price)
+            total_price = prom.apply_promotion(quantity, self._price)
         else:
             total_price = self._price * quantity
 

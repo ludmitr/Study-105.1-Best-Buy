@@ -54,6 +54,7 @@ class SecondHalfPrice(Promotion):
         Returns:
             float: The total price after applying the discount.
         """
+
         discount = 0.5
         full_price_items = (quantity + 1) // 2
         discounted_items = quantity - full_price_items
