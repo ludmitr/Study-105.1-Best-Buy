@@ -15,6 +15,24 @@ class Product:
         self._active = True
         self._promotion: promotions.Promotion = None
 
+
+    def __gt__(self, other):
+        return self.price > other.price
+
+    def __lt__(self, other):
+        return self.price < other.price
+    def get_price(self) -> float:
+        return self._price
+
+    def set_price(self, price: float):
+        if price < 0:
+                raise ValueError("price cannot be negative")
+        self._price = price
+
+    price = property(get_price, set_price)
+    def __str__(self):
+        return self.show()
+
     def get_promotion(self):
         """returns list[Promotion] of promotions of the class"""
         return self._promotion
@@ -43,6 +61,7 @@ class Product:
             self._active = False
 
     __set_quantity = set_quantity
+    quantity = property(get_quantity, set_quantity)
 
     def is_active(self) -> bool:
         """Returns True if the product is active, otherwise False."""
@@ -104,6 +123,8 @@ class NonStockedProduct(Product):
     def get_quantity(self) -> int:
         """returns quantity of product"""
         return NonStockedProduct._QUANTITY
+
+    quantity = property(get_quantity, set_quantity)
 
     def buy(self, quantity: int) -> float:
         """Buys a given quantity of the product.

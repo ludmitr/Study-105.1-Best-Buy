@@ -1,6 +1,7 @@
 import products
 import pytest
 import promotions
+import store
 
 
 def test_creating_instance():
@@ -58,5 +59,41 @@ def test_property_promotion():
     assert test_prod.promotion.get_name() == "Third One Free!"
     del test_prod.promotion
     assert not test_prod.promotion
+
+
+def test_property_quantity():
+    """Test property quantity for NonStockedProduct """
+    test_prod = products.NonStockedProduct("tv", 22.5)
+    test_prod.quantity = 10
+    assert not test_prod.quantity, "checking that quantity is 0"
+
+
+def test_property_price():
+    """negative price raise an error"""
+    test_prod = products.NonStockedProduct("tv", 22.5)
+
+    with pytest.raises(ValueError, match="price cannot be negative"):
+        test_prod.price = - 100
+    assert test_prod.price == 22.5
+
+
+def test_magic_methods():
+    """Testing magic methods of product"""
+    # setup initial stock of inventory
+    mac = products.Product("MacBook Air M2", price=1450, quantity=100)
+    bose = products.Product("Bose QuietComfort Earbuds", price=250,
+                            quantity=500)
+    pixel = products.Product("Google Pixel 7", price=500, quantity=250)
+    windw = products.NonStockedProduct("Windows 8", price=200)
+    best_buy = store.Store([mac, bose])
+
+    assert str(mac) == mac.show()
+    assert str(windw) == windw.show(), "subclasses print the right represent"
+    assert bose < mac
+    assert mac > bose
+    assert mac in best_buy
+    assert pixel not in best_buy
+
+
 
 pytest.main()

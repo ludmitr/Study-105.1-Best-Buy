@@ -6,6 +6,9 @@ class Store:
     def __init__(self, store_products: list[Product]):
         self._products = store_products
 
+    def __contains__(self, item):
+        return item in self._products
+
     def add_product(self, product: Product):
         """Adding product to the list of products in the store"""
         self._products.append(product)
