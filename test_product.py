@@ -28,7 +28,7 @@ def test_prod_becomes_inactive():
     0 quantity"""
     # checking case when i set quantity to 0
     test_product = products.Product("tv", 22.5, 1)
-    test_product.set_quantity(0)
+    test_product.quantity = 0
     assert not test_product.is_active()
 
     # checking case when i buy product and amount left is 0
@@ -41,7 +41,7 @@ def test_purchase_modify_quantity():
     """test that buying product modify quantity of a product"""
     test_product = products.Product("tv", 22.5, 110)
     test_product.buy(100)
-    assert test_product.get_quantity() == 10
+    assert test_product.quantity == 10
 
 
 def test_buy_larger_quantity():
@@ -57,8 +57,7 @@ def test_property_promotion():
     test_prom = promotions.ThirdOneFree("Third One Free!")
     test_prod.promotion = test_prom
     assert test_prod.promotion.get_name() == "Third One Free!"
-    del test_prod.promotion
-    assert not test_prod.promotion
+    assert test_prod.promotion
 
 
 def test_property_quantity():
@@ -74,6 +73,7 @@ def test_property_price():
 
     with pytest.raises(ValueError, match="price cannot be negative"):
         test_prod.price = - 100
+
     assert test_prod.price == 22.5
 
 
