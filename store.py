@@ -22,7 +22,7 @@ class Store:
 
     def get_total_quantity(self) -> int:
         """Returns how many items are in the store in total."""
-        total_quantity = sum(prod.get_quantity() for prod in self._products)
+        total_quantity = sum(prod.quantity for prod in self._products)
         return total_quantity
 
     def get_all_products(self) -> list[Product]:
